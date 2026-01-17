@@ -1,0 +1,235 @@
+{
+  "config": {
+    "configFile": "F:\\RunwalSeagull\\runwal-seagull\\playwright.config.ts",
+    "rootDir": "F:/RunwalSeagull/runwal-seagull/__tests__/e2e",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": "F:\\RunwalSeagull\\runwal-seagull\\__tests__\\setup\\playwright.global-setup.ts",
+    "globalTeardown": "F:\\RunwalSeagull\\runwal-seagull\\__tests__\\setup\\playwright.global-teardown.ts",
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "playwright-report/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "F:/RunwalSeagull/runwal-seagull/playwright-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "F:/RunwalSeagull/runwal-seagull/__tests__/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.{test,spec}.{ts,tsx}"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.57.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "admin-users.spec.ts",
+      "file": "admin-users.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Phase 5: Admin Portal - User Management Tests",
+          "file": "admin-users.spec.ts",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "AUSR-002: Filter by role - Admin selected",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10503,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-17T19:06:19.708Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "F:\\RunwalSeagull\\runwal-seagull\\playwright-results\\admin-users-Phase-5-Admin--0395a-er-by-role---Admin-selected-chromium\\video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "F:\\RunwalSeagull\\runwal-seagull\\playwright-results\\admin-users-Phase-5-Admin--0395a-er-by-role---Admin-selected-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9d69cbef181f9ad01509-429eb6090b43b09a436e",
+              "file": "admin-users.spec.ts",
+              "line": 255,
+              "column": 9
+            },
+            {
+              "title": "AUSR-003: Filter by status - Pending selected",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7983,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-17T19:06:34.296Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "F:\\RunwalSeagull\\runwal-seagull\\playwright-results\\admin-users-Phase-5-Admin--b35fb-y-status---Pending-selected-chromium\\video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "F:\\RunwalSeagull\\runwal-seagull\\playwright-results\\admin-users-Phase-5-Admin--b35fb-y-status---Pending-selected-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9d69cbef181f9ad01509-e08846e59c4a087e2ae6",
+              "file": "admin-users.spec.ts",
+              "line": 276,
+              "column": 9
+            },
+            {
+              "title": "AUSR-004: Filter by building - Specific building",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6860,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-17T19:06:42.469Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "F:\\RunwalSeagull\\runwal-seagull\\playwright-results\\admin-users-Phase-5-Admin--56780-uilding---Specific-building-chromium\\video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "F:\\RunwalSeagull\\runwal-seagull\\playwright-results\\admin-users-Phase-5-Admin--56780-uilding---Specific-building-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9d69cbef181f9ad01509-57112aec37d66867da70",
+              "file": "admin-users.spec.ts",
+              "line": 297,
+              "column": 9
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-01-17T19:06:07.834Z",
+    "duration": 43365.748999999996,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

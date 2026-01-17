@@ -1,0 +1,437 @@
+// Runwal Seagull Society - Database Schema
+// Complete schema with 14 tables for society management portal
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==================== ENUMS ====================
+
+enum UserRole {
+  PUBLIC
+  OWNER
+  TENANT
+  ADMIN
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum UserType {
+  OWNER
+  TENANT
+}
+
+enum NoticeType {
+  GENERAL
+  URGENT
+  MAINTENANCE
+  EVENT
+}
+
+enum Visibility {
+  PUBLIC
+  REGISTERED
+  ADMIN
+}
+
+enum EventType {
+  FESTIVAL
+  SPORTS
+  CULTURAL
+  MEETING
+  SOCIAL
+  OTHER
+}
+
+enum ParticipationType {
+  INDIVIDUAL
+  TEAM
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  WAITLIST
+  CANCELLED
+}
+
+enum VehicleType {
+  CAR
+  BIKE
+  SCOOTER
+  OTHER
+}
+
+enum MarketplaceCategory {
+  SELL
+  RENT
+  SERVICE
+  OTHER
+}
+
+enum AdStatus {
+  ACTIVE
+  SOLD
+  REMOVED
+}
+
+enum ContactPreference {
+  PHONE
+  EMAIL
+  BOTH
+}
+
+enum ComplaintCategory {
+  MAINTENANCE
+  SECURITY
+  CLEANLINESS
+  NOISE
+  PARKING
+  OTHER
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ComplaintStatus {
+  SUBMITTED
+  ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum ServiceCategory {
+  DOCTOR
+  PLUMBER
+  ELECTRICIAN
+  CARPENTER
+  PAINTER
+  INTERNET_PROVIDER
+  PEST_CONTROL
+  HOUSEKEEPING
+  TUITION
+  OTHER
+}
+
+enum ApprovalStatus {
+  PENDING
+  PUBLISHED
+  REJECTED
+}
+
+// ==================== MODELS ====================
+
+model User {
+  id               String      @id @default(uuid())
+  email            String      @unique
+  passwordHash     String      @map("password_hash")
+  name             String
+  phoneNumber      String?     @map("phone_number") @db.VarChar(15)
+  role             UserRole    @default(PUBLIC)
+  status           UserStatus  @default(PENDING)
+  buildingId       String?     @map("building_id")
+  flatId           String?     @map("flat_id")
+  userType         UserType?   @map("user_type")
+  profileImageUrl  String?     @map("profile_image_url") @db.Text
+  createdAt        DateTime    @default(now()) @map("created_at")
+  updatedAt        DateTime    @updatedAt @map("updated_at")
+  approvedBy       String?     @map("approved_by")
+  approvedAt       DateTime?   @map("approved_at")
+  isProfilePublic  Boolean     @default(true) @map("is_profile_public")
+
+  // Relations
+  building                Building?             @relation("UserBuilding", fields: [buildingId], references: [id])
+  flat                    Flat?                 @relation("UserFlat", fields: [flatId], references: [id])
+  approver                User?                 @relation("UserApprover", fields: [approvedBy], references: [id])
+  approvedUsers           User[]                @relation("UserApprover")
+  ownedFlats              Flat[]                @relation("FlatOwner")
+  tenantFlats             Flat[]                @relation("FlatTenant")
+  notices                 Notice[]
+  events                  Event[]
+  eventRegistrations      EventRegistration[]
+  vehicles                Vehicle[]
+  marketplaceAds          MarketplaceAd[]
+  complaints              Complaint[]           @relation("ComplaintUser")
+  assignedComplaints      Complaint[]           @relation("ComplaintAssignee")
+  complaintAssignments    Complaint[]           @relation("ComplaintAssigner")
+  complaintComments       ComplaintComment[]
+  complaintStatusChanges  ComplaintStatusHistory[]
+  yellowPagesSubmissions  YellowPage[]          @relation("YellowPageSubmitter")
+  yellowPagesApprovals    YellowPage[]          @relation("YellowPageApprover")
+  yellowPagesReviews      YellowPageReview[]
+  activityLogs            ActivityLog[]
+
+  @@map("users")
+}
+
+model Building {
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(100)
+  buildingCode String  @unique @map("building_code") @db.VarChar(10)
+  totalFloors Int?     @map("total_floors")
+  description String?  @db.Text
+  isActiveForRegistration Boolean @default(true) @map("is_active_for_registration")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  flats       Flat[]
+  users       User[]   @relation("UserBuilding")
+
+  @@map("buildings")
+}
+
+model Flat {
+  id              String   @id @default(uuid())
+  buildingId      String   @map("building_id")
+  flatNumber      String   @map("flat_number") @db.VarChar(20)
+  floorNumber     Int?     @map("floor_number")
+  bhkType         String?  @map("bhk_type") @db.VarChar(10)
+  ownerId         String?  @map("owner_id")
+  currentTenantId String?  @map("current_tenant_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  // Relations
+  building      Building @relation(fields: [buildingId], references: [id])
+  owner         User?    @relation("FlatOwner", fields: [ownerId], references: [id])
+  currentTenant User?    @relation("FlatTenant", fields: [currentTenantId], references: [id])
+  users         User[]   @relation("UserFlat")
+
+  @@unique([buildingId, flatNumber])
+  @@map("flats")
+}
+
+model Notice {
+  id             String      @id @default(uuid())
+  title          String      @db.VarChar(200)
+  content        String      @db.Text
+  noticeType     NoticeType  @map("notice_type")
+  visibility     Visibility  @default(PUBLIC)
+  published      Boolean     @default(false)
+  attachmentUrls Json?       @map("attachment_urls")
+  createdBy      String      @map("created_by")
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
+  publishedAt    DateTime?   @map("published_at")
+
+  // Relations
+  creator User @relation(fields: [createdBy], references: [id])
+
+  @@map("notices")
+}
+
+model Event {
+  id                    String              @id @default(uuid())
+  title                 String              @db.VarChar(200)
+  description           String?             @db.Text
+  eventType             EventType           @map("event_type")
+  startDate             DateTime            @map("start_date")
+  endDate               DateTime            @map("end_date")
+  venue                 String?             @db.VarChar(200)
+  registrationRequired  Boolean             @default(false) @map("registration_required")
+  registrationStartDate DateTime?           @map("registration_start_date")
+  registrationEndDate   DateTime?           @map("registration_end_date")
+  participationType     ParticipationType?  @map("participation_type")
+  maxParticipants       Int?                @map("max_participants")
+  published             Boolean             @default(false)
+  imageUrl              String?             @map("image_url") @db.Text
+  createdBy             String              @map("created_by")
+  createdAt             DateTime            @default(now()) @map("created_at")
+  updatedAt             DateTime            @updatedAt @map("updated_at")
+  publishedAt           DateTime?           @map("published_at")
+
+  // Relations
+  creator        User                @relation(fields: [createdBy], references: [id])
+  registrations  EventRegistration[]
+
+  @@map("events")
+}
+
+model EventRegistration {
+  id                 String             @id @default(uuid())
+  eventId            String             @map("event_id")
+  userId             String             @map("user_id")
+  teamMembers        Json?              @map("team_members")
+  additionalNotes    String?            @map("additional_notes") @db.Text
+  registrationStatus RegistrationStatus @default(REGISTERED) @map("registration_status")
+  registeredAt       DateTime           @default(now()) @map("registered_at")
+
+  // Relations
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@map("event_registrations")
+}
+
+model Vehicle {
+  id            String      @id @default(uuid())
+  userId        String      @map("user_id")
+  vehicleNumber String      @unique @map("vehicle_number") @db.VarChar(20)
+  vehicleType   VehicleType @map("vehicle_type")
+  brand         String?     @db.VarChar(50)
+  model         String?     @db.VarChar(50)
+  color         String?     @db.VarChar(30)
+  parkingSlot   String?     @map("parking_slot") @db.VarChar(20)
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("vehicles")
+}
+
+model MarketplaceAd {
+  id                String              @id @default(uuid())
+  userId            String              @map("user_id")
+  category          MarketplaceCategory
+  title             String              @db.VarChar(200)
+  description       String              @db.Text
+  price             Decimal?            @db.Decimal(10, 2)
+  images            Json?
+  status            AdStatus            @default(ACTIVE)
+  contactPreference ContactPreference   @default(BOTH) @map("contact_preference")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+  soldAt            DateTime?           @map("sold_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("marketplace_ads")
+}
+
+model Complaint {
+  id               String            @id @default(uuid())
+  complaintNumber  String            @unique @map("complaint_number") @db.VarChar(20)
+  userId           String            @map("user_id")
+  category         ComplaintCategory
+  subject          String            @db.VarChar(200)
+  description      String            @db.Text
+  priority         Priority          @default(MEDIUM)
+  status           ComplaintStatus   @default(SUBMITTED)
+  assignedTo       String?           @map("assigned_to")
+  assignedBy       String?           @map("assigned_by")
+  attachmentUrls   Json?             @map("attachment_urls")
+  location         String?           @db.VarChar(200)
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  resolvedAt       DateTime?         @map("resolved_at")
+  closedAt         DateTime?         @map("closed_at")
+
+  // Relations
+  user           User                     @relation("ComplaintUser", fields: [userId], references: [id])
+  assignee       User?                    @relation("ComplaintAssignee", fields: [assignedTo], references: [id])
+  assigner       User?                    @relation("ComplaintAssigner", fields: [assignedBy], references: [id])
+  comments       ComplaintComment[]
+  statusHistory  ComplaintStatusHistory[]
+
+  @@map("complaints")
+}
+
+model ComplaintComment {
+  id             String    @id @default(uuid())
+  complaintId    String    @map("complaint_id")
+  userId         String    @map("user_id")
+  comment        String    @db.Text
+  isInternal     Boolean   @default(false) @map("is_internal")
+  attachmentUrls Json?     @map("attachment_urls")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  complaint Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@map("complaint_comments")
+}
+
+model ComplaintStatusHistory {
+  id          String    @id @default(uuid())
+  complaintId String    @map("complaint_id")
+  changedBy   String    @map("changed_by")
+  oldStatus   String    @map("old_status") @db.VarChar(50)
+  newStatus   String    @map("new_status") @db.VarChar(50)
+  remarks     String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  complaint Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [changedBy], references: [id])
+
+  @@map("complaint_status_history")
+}
+
+model YellowPage {
+  id                  String          @id @default(uuid())
+  submittedBy         String          @map("submitted_by")
+  category            ServiceCategory
+  serviceProviderName String          @map("service_provider_name") @db.VarChar(100)
+  contactNumber       String          @map("contact_number") @db.VarChar(15)
+  alternateContact    String?         @map("alternate_contact") @db.VarChar(15)
+  email               String?         @db.VarChar(100)
+  areaOfService       String          @map("area_of_service") @db.VarChar(200)
+  description         String          @db.Text
+  workingHours        String?         @map("working_hours") @db.VarChar(100)
+  serviceCharges      String?         @map("service_charges") @db.VarChar(100)
+  experienceYears     Int?            @map("experience_years")
+  rating              Decimal         @default(0.00) @db.Decimal(3, 2)
+  recommendationNote  String?         @map("recommendation_note") @db.Text
+  visitingCardUrl     String?         @map("visiting_card_url") @db.Text
+  status              ApprovalStatus  @default(PENDING)
+  approvedBy          String?         @map("approved_by")
+  publishedAt         DateTime?       @map("published_at")
+  createdAt           DateTime        @default(now()) @map("created_at")
+  updatedAt           DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  submitter User               @relation("YellowPageSubmitter", fields: [submittedBy], references: [id])
+  approver  User?              @relation("YellowPageApprover", fields: [approvedBy], references: [id])
+  reviews   YellowPageReview[]
+
+  @@map("yellow_pages")
+}
+
+model YellowPageReview {
+  id            String   @id @default(uuid())
+  yellowPageId  String   @map("yellow_page_id")
+  userId        String   @map("user_id")
+  rating        Int
+  review        String?  @db.Text
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  // Relations
+  yellowPage YellowPage @relation(fields: [yellowPageId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id])
+
+  @@unique([yellowPageId, userId])
+  @@map("yellow_pages_reviews")
+}
+
+model ActivityLog {
+  id         String    @id @default(uuid())
+  userId     String?   @map("user_id")
+  action     String    @db.VarChar(100)
+  entityType String?   @map("entity_type") @db.VarChar(50)
+  entityId   String?   @map("entity_id")
+  details    Json?
+  ipAddress  String?   @map("ip_address") @db.VarChar(45)
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("activity_logs")
+}

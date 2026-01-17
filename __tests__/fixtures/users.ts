@@ -1,0 +1,73 @@
+import { User, UserRole, UserStatus } from "@prisma/client";
+
+export const mockAdminUser: User = {
+    id: "admin-id",
+    name: "Admin User",
+    email: "admin@test.com",
+    passwordHash: "hashed-password",
+    phoneNumber: "1234567890",
+    role: "ADMIN",
+    status: "APPROVED",
+    userType: "OWNER",
+    buildingId: "building-a",
+    flatId: "flat-101",
+    profileImageUrl: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    approvedBy: null,
+    approvedAt: new Date(),
+};
+
+export const mockOwnerUser: User = {
+    id: "owner-id",
+    name: "Owner User",
+    email: "owner@test.com",
+    passwordHash: "hashed-password",
+    phoneNumber: "0987654321",
+    role: "OWNER",
+    status: "APPROVED",
+    userType: "OWNER",
+    buildingId: "building-a",
+    flatId: "flat-102",
+    profileImageUrl: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    approvedBy: "admin-id",
+    approvedAt: new Date(),
+};
+
+export const mockTenantUser: User = {
+    id: "tenant-id",
+    name: "Tenant User",
+    email: "tenant@test.com",
+    passwordHash: "hashed-password",
+    phoneNumber: "1122334455",
+    role: "TENANT",
+    status: "APPROVED",
+    userType: "TENANT",
+    buildingId: "building-b",
+    flatId: "flat-201",
+    profileImageUrl: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    approvedBy: "admin-id",
+    approvedAt: new Date(),
+};
+
+export const mockPendingUser: User = {
+    id: "pending-id",
+    name: "Pending User",
+    email: "pending@test.com",
+    passwordHash: "hashed-password",
+    phoneNumber: "5566778899",
+    role: "PUBLIC",
+    status: "PENDING",
+    userType: "OWNER",
+    buildingId: "building-a",
+    flatId: "flat-103",
+    profileImageUrl: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    approvedBy: null,
+    approvedAt: null,
+};
